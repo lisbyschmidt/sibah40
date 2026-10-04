@@ -1,0 +1,195 @@
+:root {
+  --bg: #fff6ee;
+  --bg2: #ffe3d6;
+  --ink: #3b2430;
+  --muted: #8a6a72;
+  --coral: #ff5d73;
+  --coral-dark: #e0435a;
+  --gold: #f4b740;
+  --card: #ffffff;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Nunito", system-ui, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 20% 10%, var(--bg2), transparent 50%),
+              radial-gradient(circle at 90% 90%, #ffd9e2, transparent 45%),
+              var(--bg);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 560px;
+  margin: auto; /* centrerer, men kan scrolle hvis indholdet er højere end skærmen */
+  text-align: center;
+  overflow-wrap: break-word;
+  animation: fade-in .5s ease both; /* kun opacity: transform ville bryde position:fixed */
+}
+.screen.active { display: block; }
+
+h1, h2, h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: .4em 0;
+}
+h1 { font-size: clamp(2rem, 7vw, 3rem); }
+h2 { font-size: clamp(1.5rem, 5.5vw, 2.1rem); }
+h3 { font-size: 1.6rem; color: var(--coral-dark); }
+p { font-size: 1.15rem; line-height: 1.5; }
+
+.badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: .9;
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  font-family: "Fraunces", serif;
+  font-weight: 800;
+  font-size: 2.6rem;
+  box-shadow: 0 8px 0 #d99a22, 0 14px 30px rgba(0,0,0,.12);
+  animation: wobble 2.4s ease-in-out infinite;
+}
+.badge small {
+  font-size: .38em;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.round-label {
+  color: var(--muted);
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: .9rem;
+  margin: 0;
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.15rem;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 28px;
+  cursor: pointer;
+  color: #fff;
+  background: var(--coral);
+  box-shadow: 0 6px 0 var(--coral-dark);
+  transition: transform .15s ease, box-shadow .15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--coral-dark); }
+
+/* Forkerte knapper ser ud præcis som de rigtige, så farven ikke afslører noget */
+.btn.wrong {
+  touch-action: none;
+}
+.btn.wrong.fleeing {
+  position: fixed;
+  z-index: 10;
+  margin: 0;
+  transition: left .25s cubic-bezier(.3,1.5,.6,1), top .25s cubic-bezier(.3,1.5,.6,1), transform .2s;
+}
+
+.round-image {
+  display: block;
+  width: auto; /* billedet bestemmer selv bredden, så de runde hjørner sidder på selve billedet */
+  max-width: 100%;
+  max-height: 40vh;
+  margin: 28px auto 0;
+  border-radius: 20px;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--coral-dark);
+  box-shadow: inset 0 0 0 2px var(--coral);
+  margin-top: 20px;
+}
+
+.sides {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: grid;
+  gap: 12px;
+}
+.sides li {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 30px rgba(59,36,48,.10);
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--coral-dark);
+}
+
+.hearts {
+  position: fixed;
+  top: 16px; left: 0; right: 0;
+  text-align: center;
+  font-size: 1.8rem;
+  letter-spacing: 8px;
+  z-index: 5;
+}
+.heart { color: #e9cfd4; transition: color .4s, transform .4s; display: inline-block; }
+.heart.filled { color: var(--coral); transform: scale(1.25); }
+
+.signature { font-family: "Fraunces", serif; font-size: 1.3rem; margin-top: 1.2em; }
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(16px) scale(.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes wobble {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge { animation: none; }
+}

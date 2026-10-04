@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Tillykke med de 40 år, kære Signe!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hearts" id="progress" aria-label="Fremskridt" hidden>
+    <span class="heart">♥</span><span class="heart">♥</span><span class="heart">♥</span>
+  </div>
+
+  <main>
+    <!-- Intro -->
+    <section class="screen active" id="intro">
+      <div class="badge">40<small>år</small></div>
+      <h1 id="intro-title"></h1>
+      <p id="intro-text"></p>
+      <div class="choices">
+        <button class="btn right" id="intro-yes"></button>
+        <button class="btn wrong" id="intro-no"></button>
+      </div>
+    </section>
+
+    <!-- Runde -->
+    <section class="screen" id="round">
+      <p class="round-label" id="round-label"></p>
+      <h2 id="question"></h2>
+      <div class="choices" id="round-choices"></div>
+      <img class="round-image" id="round-image" alt="" hidden>
+    </section>
+
+    <!-- Slut -->
+    <section class="screen" id="final">
+      <div class="badge">40<small>år</small></div>
+      <h1 id="final-title"></h1>
+      <p id="final-intro"></p>
+      <ol class="sides" id="final-sides"></ol>
+      <p id="final-outro"></p>
+      <p class="signature" id="final-signature"></p>
+      <button class="btn ghost" id="again"></button>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="content.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
