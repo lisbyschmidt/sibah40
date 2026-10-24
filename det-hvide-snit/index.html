@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Det hvide snit 🥂</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff6ee;
+      --bg2: #ffe3d6;
+      --ink: #3b2430;
+      --muted: #8a6a72;
+      --coral: #ff5d73;
+      --coral-dark: #e0435a;
+      --gold: #f4b740;
+      --champagne: #fdecc4;
+      --card: #ffffff;
+      --right: #2f8f5b;
+      --right-bg: #e3f4ea;
+      --wrong: #c8384f;
+      --wrong-bg: #fbe4e8;
+      /* Header og knapper flugter med indholdets 560px-kolonne på brede skærme */
+      --gutter: max(16px, calc((100% - 560px) / 2));
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: flex; flex-direction: column;
+      height: 100dvh;
+      font-family: "Nunito", system-ui, sans-serif;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--ink);
+      background: radial-gradient(circle at 15% 5%, var(--champagne), transparent 45%),
+                  radial-gradient(circle at 95% 95%, #ffd9e2, transparent 45%),
+                  var(--bg);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    header { padding: calc(10px + env(safe-area-inset-top)) var(--gutter) 8px; }
+    .topline { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .topline strong { font-family: "Fraunces", Georgia, serif; font-size: 1.15rem; white-space: nowrap; }
+    #score { font-size: .95rem; font-weight: 800; white-space: nowrap; color: var(--coral-dark); }
+    .bar { height: 8px; margin-top: 8px; border-radius: 99px; background: #f3dfd2; overflow: hidden; }
+    #bar-fill { height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--gold), var(--coral)); transition: width .4s ease; }
+
+    main { flex: 1; overflow-y: auto; padding: 8px 16px 16px; }
+    .step { max-width: 560px; margin: 0 auto; overflow-wrap: break-word; animation: pop-in .35s ease both; }
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 20px 18px;
+      margin: 8px 0 14px;
+      box-shadow: 0 6px 24px rgba(224, 67, 90, .12);
+    }
+    .center { text-align: center; }
+    h1, h2, h3 { font-family: "Fraunces", Georgia, serif; line-height: 1.15; margin: .3em 0; }
+    h1 { font-size: clamp(2.1rem, 9vw, 2.8rem); }
+    h2 { font-size: 1.45rem; }
+    .emoji { font-size: 3.2rem; line-height: 1; margin: 6px 0; }
+    .chip {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 99px;
+      font-size: .85rem; font-weight: 800;
+      color: #fff; background: var(--coral);
+    }
+    .chip.bonus { color: var(--ink); background: var(--gold); }
+    .sub { color: var(--muted); font-weight: 700; font-size: .9rem; margin-left: 6px; }
+    .muted { color: var(--muted); }
+    .options { display: grid; gap: 10px; margin-top: 14px; }
+    .options button {
+      min-height: 52px;
+      padding: 12px 16px;
+      font: inherit; font-weight: 700; text-align: left;
+      color: var(--ink);
+      background: #fff;
+      border: 2px solid #f0d9cc;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform .1s ease;
+    }
+    .options button:active:not(:disabled) { transform: scale(.97); }
+    .options button:disabled { cursor: default; opacity: .5; }
+    .options button.right { background: var(--right-bg); border-color: var(--right); opacity: 1; }
+    .options button.wrong { background: var(--wrong-bg); border-color: var(--wrong); opacity: 1; }
+    .options button.right::after { content: "  ✓"; color: var(--right); }
+    .options button.wrong::after { content: "  ✗"; color: var(--wrong); }
+    .verdict { font-family: "Fraunces", Georgia, serif; font-size: 1.3rem; font-weight: 800; margin: 16px 0 4px; }
+    .verdict.right { color: var(--right); animation: wiggle .5s ease; }
+    .verdict.wrong { color: var(--wrong); }
+    .explanation { margin: 0; animation: fade-in .4s ease both; }
+    .card.bonus { background: #fffaf0; border: 2px dashed var(--gold); }
+    .card.bonus p { margin: .5em 0; }
+    .big { font-family: "Fraunces", Georgia, serif; font-size: 3.4rem; font-weight: 800; margin: 0; color: var(--coral-dark); }
+    .wine dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 8px 0; }
+    .wine dt { color: var(--muted); }
+    .wine dd { margin: 0; font-weight: 700; }
+    a { color: var(--coral-dark); font-weight: 800; }
+
+    nav {
+      display: flex; gap: 10px;
+      padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+      background: rgba(255, 246, 238, .92);
+      border-top: 1px solid #f3dfd2;
+    }
+    nav button, .btn {
+      flex: 1;
+      min-height: 52px;
+      font: inherit; font-weight: 800;
+      border: 0; border-radius: 99px;
+      cursor: pointer;
+    }
+    #next, .btn { color: #fff; background: var(--coral); box-shadow: 0 4px 0 var(--coral-dark); }
+    #next:active, .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--coral-dark); }
+    #back { flex: 0 0 34%; color: var(--ink); background: #fff; border: 2px solid #f0d9cc; }
+    nav button:disabled { visibility: hidden; }
+    #next:disabled { visibility: visible; opacity: .45; box-shadow: none; cursor: default; font-size: .95rem; }
+    .btn { display: block; width: 100%; margin-top: 12px; padding: 0 16px; }
+    .btn.ghost { color: var(--muted); background: transparent; box-shadow: none; border: 2px solid #f0d9cc; }
+
+    @keyframes pop-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes wiggle { 25% { transform: rotate(-3deg); } 75% { transform: rotate(3deg); } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topline">
+      <strong>Det hvide snit 🥂</strong>
+      <span id="score" aria-live="polite"></span>
+    </div>
+    <div class="bar"><div id="bar-fill"></div></div>
+  </header>
+
+  <main><div class="step" id="step"></div></main>
+
+  <nav>
+    <button id="back">← Tilbage</button>
+    <button id="next">Næste →</button>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="quiz.js"></script>
+  <script>
+    const KEY = "det-hvide-snit";
+    const RIGHT = ["Skål, det er rigtigt! 🥂", "Vinnæse i verdensklasse! 👃✨", "Sommelier-niveau! 🍾", "Pletskud! 🎯", "Du er jo en vinkender! 💅"];
+    const WRONG = ["Tæt på! Tag en slurk mere 🥂", "Nope, men vinen smager stadig godt 😄", "Hov! Druen snød dig 🙈", "Næste gang! Skål alligevel 🥂"];
+    const COLORS = ["#ff5d73", "#f4b740", "#fdecc4", "#ffd9e2"];
+
+    // Én skærm pr. trin: intro, hvert spørgsmål, en pause efter hver vin, hver bonusopgave og til sidst afsløringen.
+    const steps = [{ type: "intro" }];
+    for (const s of QUIZ.sections) {
+      if (s.type === "wine") {
+        s.questions.forEach((q, i) => steps.push({ type: "question", q, title: s.title, n: i + 1, of: s.questions.length }));
+        steps.push({ type: "done", title: s.title, questions: s.questions });
+      } else {
+        s.tasks.forEach((t, i) => steps.push({ type: "bonus", t, title: s.title, intro: i === 0 && s.intro }));
+      }
+    }
+    steps.push({ type: "final" });
+    const questions = steps.filter(s => s.type === "question").map(s => s.q);
+
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+    function save() {
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    }
+    let current = saved.step || 0;
+
+    // Man kan ikke gå videre end den vin, man er nået til: sidste trin er det sidste spørgsmål
+    // i den første vin med ubesvarede spørgsmål. Er alt besvaret, kan man nå afsløringen.
+    function lastOpen() {
+      const open = steps.find(s => s.type === "question" && !("q" + s.q.label in saved));
+      return open ? steps.findLastIndex(s => s.type === "question" && s.title === open.title) : steps.length - 1;
+    }
+
+    function el(tag, props, ...children) {
+      const node = Object.assign(document.createElement(tag), props);
+      node.append(...children);
+      return node;
+    }
+    function labelled(name, text) {
+      return el("p", {}, el("strong", { textContent: name + ": " }), text);
+    }
+    function confettiBurst(opts) {
+      if (typeof confetti !== "function") return;
+      confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors: COLORS, ...opts });
+    }
+
+    function renderQuestion({ q, title, n, of }) {
+      const qi = questions.indexOf(q);
+      const card = el("div", { className: "card" });
+      const buttons = q.options.map((text, i) => el("button", { textContent: text, onclick: () => answer(i) }));
+      card.append(
+        el("h2", { textContent: q.text }),
+        el("div", { className: "options" }, ...buttons),
+      );
+      function answer(picked) {
+        saved["q" + q.label] = picked;
+        save();
+        reveal(picked);
+        update();
+        if (picked === q.answer) confettiBurst();
+      }
+      function reveal(picked) {
+        const right = picked === q.answer;
+        buttons.forEach((b, i) => {
+          b.disabled = true;
+          if (i === q.answer) b.classList.add("right");
+          else if (i === picked) b.classList.add("wrong");
+        });
+        const lines = right ? RIGHT : WRONG;
+        card.append(
+          el("p", { className: "verdict " + (right ? "right" : "wrong"), textContent: lines[qi % lines.length] }),
+          el("p", { className: "explanation", textContent: q.explanation }),
+        );
+      }
+      if ("q" + q.label in saved) reveal(saved["q" + q.label]);
+      return [
+        el("span", { className: "chip", textContent: "🥂 " + title }),
+        el("span", { className: "sub", textContent: `Spørgsmål ${n} af ${of}` }),
+        card,
+      ];
+    }
+
+    function renderBonus({ t, title, intro }) {
+      const expect = el("p", { className: "explanation", hidden: true }, el("strong", { textContent: "Det kan du forvente: " }), t.expect);
+      const show = el("button", { className: "btn", textContent: "Vis hvad du kan forvente 👀" });
+      show.onclick = () => { expect.hidden = false; show.hidden = true; saved["b" + t.label] = 1; save(); };
+      if (saved["b" + t.label]) show.onclick();
+      return [
+        el("span", { className: "chip bonus", textContent: "✨ Bonus" }),
+        el("span", { className: "sub", textContent: title + " · ingen point" }),
+        intro ? el("p", { className: "muted", textContent: intro }) : "",
+        el("div", { className: "card bonus" },
+          el("h2", { textContent: t.label.replace(/^Bonus B\d: /, "") }),
+          labelled("Prøv selv", t.tryIt),
+          labelled("Sådan mærker du det", t.how),
+          show, expect,
+        ),
+      ];
+    }
+
+    function renderDone({ title, questions: qs }) {
+      const points = qs.filter(q => saved["q" + q.label] === q.answer).length;
+      const after = steps[current + 1];
+      const upNext =
+        after.type === "question" ? `Hæld op til ${after.title} 🍾` :
+        after.type === "bonus" ? `Først en lille bonus: ${after.title[0].toLowerCase() + after.title.slice(1)} ✨` :
+        "Nu skal vinene afsløres 🥁";
+      // Skal denne vin sammenlignes med den næste i en senere bonus, så mind om at gemme lidt.
+      const nextWine = steps.slice(current).find(s => s.type === "question" && s.title !== title)?.title;
+      const keep = nextWine && steps.some(s => s.type === "bonus" && s.title.includes(title) && s.title.includes(nextWine));
+      return [el("div", { className: "card center" },
+        el("div", { className: "emoji", textContent: "🥂" }),
+        el("h1", { textContent: `${title} er klaret!` }),
+        el("p", { className: "big", textContent: `${points} / ${qs.length}` }),
+        el("p", { className: "muted", textContent: `point på ${title}` }),
+        el("p", { textContent: points === qs.length ? "Fuld plade! Du har styr på den her. 👑" : points >= qs.length / 2 ? "Godt smagt! 💅" : nextWine ? "Bare rolig, næste vin bliver din! 😄" : "Bare rolig, det vigtigste er, at den smagte godt! 😄" }),
+        el("h2", { textContent: upNext }),
+        keep ? el("p", { className: "muted", textContent: `Husk at gemme lidt af ${title}, så du kan sammenligne den med ${nextWine} bagefter. 😉` }) : "",
+      )];
+    }
+
+    function renderIntro() {
+      return [el("div", { className: "card center" },
+        el("div", { className: "emoji", textContent: "🥂🍾🥂" }),
+        el("h1", { textContent: "Det hvide snit" }),
+        el("p", { textContent: "Fire hvidvine, ingen etiketter og en masse gætterier. Smag, snus, svirp med glasset og svar på spørgsmålene undervejs." }),
+        el("p", { textContent: "Du ser det rigtige svar, så snart du har valgt. Til sidst ved vi, hvem der har den bedste vinnæse! 👃✨" }),
+        el("p", { className: "muted", textContent: "Dine svar gemmes på telefonen, så du roligt kan låse skærmen undervejs." }),
+      )];
+    }
+
+    function renderFinal() {
+      const points = questions.filter(q => saved["q" + q.label] === q.answer).length;
+      const share = points / questions.length;
+      return [
+        el("div", { className: "card center" },
+          el("div", { className: "emoji", textContent: share >= .8 ? "👑" : share >= .5 ? "🥂" : "😄" }),
+          el("p", { className: "muted", textContent: "Din score" }),
+          el("p", { className: "big", textContent: `${points} / ${questions.length}` }),
+          el("p", { textContent:
+            share >= .8 ? "Vinnæse i verdensklasse! Du kan kalde dig sommelier i aften. 👑" :
+            share >= .5 ? "Flot klaret! Du smager mere end de fleste. 💅" :
+            "Det vigtigste er, at vinen smagte godt. Skål! 🥂" }),
+        ),
+        el("h2", { textContent: "Og vinene var… 🥁" }),
+        ...QUIZ.reveal.map(w => el("div", { className: "card wine" },
+          el("span", { className: "chip", textContent: "🥂 " + w.wine }),
+          el("h2", { textContent: w.name }),
+          el("dl", {},
+            el("dt", { textContent: "Område" }), el("dd", { textContent: w.area }),
+            el("dt", { textContent: "Land" }), el("dd", { textContent: w.country }),
+            el("dt", { textContent: "Drue" }), el("dd", { textContent: w.grape }),
+            el("dt", { textContent: "Årgang" }), el("dd", { textContent: w.vintage }),
+          ),
+          el("a", { href: w.pdf, target: "_blank", textContent: "Nørd videre i databladet (PDF) 🤓" }),
+        )),
+        el("button", { className: "btn ghost", textContent: "Start forfra", onclick: reset }),
+      ];
+    }
+
+    const render = { intro: renderIntro, question: renderQuestion, done: renderDone, bonus: renderBonus, final: renderFinal };
+
+    function go(i) {
+      current = Math.max(0, Math.min(i, lastOpen()));
+      saved.step = current;
+      save();
+      const step = steps[current];
+      const box = document.getElementById("step");
+      box.replaceChildren(...render[step.type](step));
+      box.style.animation = "none"; box.offsetHeight; box.style.animation = "";
+      document.querySelector("main").scrollTop = 0;
+      update();
+      if (step.type === "done") confettiBurst({ particleCount: 120, spread: 90 });
+      if (step.type === "final") {
+        confettiBurst({ particleCount: 160, spread: 100 });
+        setTimeout(() => confettiBurst({ particleCount: 120, angle: 60, origin: { x: 0, y: 0.8 } }), 250);
+        setTimeout(() => confettiBurst({ particleCount: 120, angle: 120, origin: { x: 1, y: 0.8 } }), 400);
+      }
+    }
+
+    function update() {
+      const answered = questions.filter(q => "q" + q.label in saved);
+      const points = answered.filter(q => saved["q" + q.label] === q.answer).length;
+      document.getElementById("score").textContent = `${points} / ${questions.length} point`;
+      document.getElementById("bar-fill").style.width = (100 * current / (steps.length - 1)) + "%";
+      const next = document.getElementById("next");
+      const blocked = current === lastOpen() && current < steps.length - 1;
+      document.getElementById("back").disabled = current === 0;
+      next.hidden = current === steps.length - 1;
+      next.disabled = blocked;
+      next.textContent =
+        blocked ? `Svar på hele ${steps[current].title} først` :
+        current === 0 ? "Lad os smage! 🥂" : current === steps.length - 2 ? "Afslør vinene 🥁" : "Næste →";
+    }
+
+    function reset() {
+      if (!confirm("Vil du slette alle dine svar og starte forfra?")) return;
+      saved = {};
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      go(0);
+    }
+
+    document.getElementById("back").onclick = () => go(current - 1);
+    document.getElementById("next").onclick = () => go(current + 1);
+    go(current);
+  </script>
+</body>
+</html>
